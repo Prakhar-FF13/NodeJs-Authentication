@@ -8,7 +8,7 @@ const sequelize = new Sequelize({
   database: "test",
 });
 
-const User = sequelize.define("User", {
+const User = sequelize.define("people", {
   username: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -19,10 +19,34 @@ const User = sequelize.define("User", {
   },
 });
 
+const Session = sequelize.define("sessions", {
+  sid: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true,
+  },
+  sess: {
+    type: DataTypes.JSON,
+    allowNull: false,
+  },
+  expire: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+});
+
 const sync = async () => {
   await sequelize.sync();
 };
 
 sync();
 
-module.exports = { sequelize, User };
+module.exports = { sequelize, User, Session };

@@ -1,5 +1,6 @@
 const passport = require("passport"),
-  LocalStrategy = require("passport-local").Strategy;
+  LocalStrategy = require("passport-local").Strategy,
+  { User } = require("./postgres");
 
 const verifyCallback = (username, password, done) => {
   User.findOne({
@@ -8,7 +9,7 @@ const verifyCallback = (username, password, done) => {
     .then((user) => {
       if (!user) return done(null, false);
 
-      const isValid = user.password === password;
+      const isValid = user.getDataValue("password") === password;
 
       if (!isValid) return done(null, false);
 
