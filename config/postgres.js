@@ -8,12 +8,17 @@ const sequelize = new Sequelize({
   database: "test",
 });
 
-const User = sequelize.define("User", {
+const User = sequelize.define("users_jwt", {
   username: {
     type: DataTypes.STRING,
     allowNull: false,
+    primaryKey: true,
   },
-  password: {
+  hash: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  salt: {
     type: DataTypes.STRING,
     allowNull: false,
   },
