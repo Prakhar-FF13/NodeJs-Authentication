@@ -1,13 +1,9 @@
 const express = require("express"),
   { User } = require("./config/postgres"),
   cors = require("cors"),
-  passport = require("passport"),
   utils = require("./lib/utils");
 
 const app = express();
-
-require("./config/passport")(passport);
-app.use(passport.initialize());
 
 app.use(express.static("src"));
 app.use(express.json());
@@ -72,14 +68,9 @@ app.post("/register", (req, res) => {
   }
 });
 
-app.get(
-  "/profile",
-  // do this for every route that needs protection coz jwt are stateless unlike sessions.
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    res.send("Only authenticated users can see this");
-  }
-);
+app.get("/profile", utils.authMiddleWare, (req, res) => {
+  res.send("Only authenticated users can see this");
+});
 
 app.listen(3000, () => {
   console.log("Listening to port 3000");
