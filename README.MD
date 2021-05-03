@@ -7,6 +7,7 @@
 1. passport-local branch contains code to add authentication using sessions.
 2. passport-jwt branch contains code to add authentication using jwt with passport library.
 3. custom-jwt branch contains code to add authentication using jwt without passport library. jsonwebtoken library is used here.
+4. jwt-refresh-token branch contains code to use jwts with refresh tokens.
 
 There is another branch which only explores the concepts behind JWT and cryptography.
 
@@ -23,4 +24,3 @@ There is another branch which only explores the concepts behind JWT and cryptogr
 - jsonwebtoken
 - crypto
 - sequelize (to create Database models)
-
