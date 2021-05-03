@@ -7,6 +7,8 @@ const express = require("express"),
   PUB_KEY_REFRESH = fs.readFileSync(__dirname + "/refresh_token_rsa_pub.pem"),
   { User } = require("./config/postgres");
 
+let refreshTokens = {}; // stores refresh tokens for users.
+
 const app = express();
 
 app.use(express.static("src"));
@@ -32,6 +34,7 @@ app.post("/login", (req, res) => {
           .status(404)
           .json({ status: "failure", message: "User does not exist" });
 
+      // create access and refrsh tokens
       const access_token = jwt.sign(user.toJSON(), PRIV_KEY_ACCESS, {
           expiresIn: "10m",
           algorithm: "RS256",
@@ -40,6 +43,9 @@ app.post("/login", (req, res) => {
           expiresIn: "1d",
           algorithm: "RS256",
         });
+
+      // store refresh tokens in valid list.
+      refreshTokens[refresh_token] = user.username;
 
       return res.status(201).json({
         access_token,
@@ -53,6 +59,38 @@ app.post("/login", (req, res) => {
         message: "Somethign went wrong with the server.",
       });
     });
+});
+
+app.post("/getNewToken", (req, res) => {
+  // user sends the refresh token.
+  const refreshToken = req.body.token;
+  // refresh token not sent or invalid refresh token.
+  if (!refreshToken || !refreshTokens[refreshToken])
+    return res.status(403).json({ message: "Failure" });
+
+  // verify refresh otken
+  jwt.verify(
+    refreshToken,
+    PUB_KEY_REFRESH,
+    { algorithms: "RS256" },
+    (err, user) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).json({ message: "Failure" });
+      }
+      // delete previous expires property.
+      delete user["exp"]; // needed so we can set new one.
+
+      // refrsh token valid.
+      // create new access_token.
+      const access_token = jwt.sign(user, PRIV_KEY_ACCESS, {
+        expiresIn: "10m",
+        algorithm: "RS256",
+      });
+
+      return res.status(200).json({ access_token });
+    }
+  );
 });
 
 app.post("/register", (req, res) => {
